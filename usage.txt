@@ -1,0 +1,1 @@
+docker run -it -v /var/run/docker.sock:/var/run/docker.sock -e TYPE=nixpacks vessyl-buildenv:latest
