@@ -1,0 +1,33 @@
+name: Build and Publish Vessyl Buildenv
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Extract tag name
+        id: extract_tag
+        run: echo "::set-output name=tag::${GITHUB_REF#refs/tags/}"
+
+      - name: Build Docker image
+        run: docker build -t ghcr.io/vessylapp/vessyl-buildenv:${{ steps.extract_tag.outputs.tag }} .
+
+      - name: Log in to GitHub Packages
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Tag Docker image as latest
+        run: docker tag ghcr.io/vessylapp/vessyl-buildenv:${{ steps.extract_tag.outputs.tag }} ghcr.io/vessylapp/vessyl-buildenv:latest
+
+      - name: Push Docker image to GitHub Packages
+        run: |
+          docker push ghcr.io/vessylapp/vessyl-buildenv:${{ steps.extract_tag.outputs.tag }}
+          docker push ghcr.io/vessylapp/vessyl-buildenv:latest
