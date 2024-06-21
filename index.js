@@ -6,7 +6,7 @@ const execAsync = promisify(exec);
 
 dotenv.config();
 
-const { TYPE, GITHUB_APP_ID, GITHUB_APP_SECRET, REPO_NAME } = process.env;
+const { TYPE, REPO_NAME, GITHUB_PAT, GITHUB_USERNAME } = process.env;
 
 if(TYPE === "nixpacks") {
   console.log("Nixpacks");
@@ -15,7 +15,11 @@ if(TYPE === "nixpacks") {
 }
 
 async function cloneRepo() {
-    const cloneCommand = `git clone https://github.com/${REPO_NAME} /builder`;
+    let cloneCommand = `git clone https://github.com/${REPO_NAME} /builder`;
+
+    if(GITHUB_PAT && GITHUB_USERNAME) {
+        cloneCommand = `git clone https://${GITHUB_USERNAME}:${GITHUB_PAT}@github.com/${REPO_NAME} /builder`;
+    }
 
     await exec(cloneCommand, (error, stdout, stderr) => {
         if (error) {
