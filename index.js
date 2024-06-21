@@ -98,14 +98,14 @@ async function buildWithDockerfile() {
 
 async function removeOldContainers() {
     const stopContainersCommand = `docker ps -a -q --filter ancestor=${REPO_NAME} | xargs -r docker stop || true`;
-    const deleteCommand = `docker ps -a -q --filter ancestor=${REPO_NAME} | xargs -r docker rm && docker rmi ${REPO_NAME} || true`;
+    const deleteContainersCommand = `docker ps -a -q --filter ancestor=${REPO_NAME} | xargs -r docker rm || true`;
 
     try {
         const { stdout: stdoutStop, stderr: stderrStop } = await execAsync(stopContainersCommand);
         console.log(`${stdoutStop}`);
         console.error(`${stderrStop}`);
 
-        const { stdout: stdoutDelete, stderr: stderrDelete } = await execAsync(deleteCommand);
+        const { stdout: stdoutDelete, stderr: stderrDelete } = await execAsync(deleteContainersCommand);
         console.log(`${stdoutDelete}`);
         console.error(`${stderrDelete}`);
     } catch (error) {
