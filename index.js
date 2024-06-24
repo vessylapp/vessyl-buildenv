@@ -30,13 +30,13 @@ async function cloneRepo() {
         console.error(`${stderr}`);
         afterCloned();
     });
-
-    console.log("Repository cloned successfully");
 }
 
 async function afterCloned() {
     const stopContainersCommand = `docker ps -a -q --filter ancestor=${REPO_NAME} | xargs -r docker stop || true`;
     const deleteCommand = `docker ps -a -q --filter ancestor=${REPO_NAME} | xargs -r docker rm && docker rmi ${REPO_NAME} || true`;
+
+    console.log("Repository cloned successfully");
 
     try {
         const { stdout: stdoutStop, stderr: stderrStop } = await execAsync(stopContainersCommand);
