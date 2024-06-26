@@ -6,12 +6,12 @@ const execAsync = promisify(exec);
 
 dotenv.config();
 
-const { TYPE, REPO_NAME, GITHUB_PAT, GITHUB_USERNAME, ID, BASE_DIR_ENV } = process.env;
+const { TYPE, REPO_NAME, GITHUB_PAT, GITHUB_USERNAME, ID, BASE_DIR } = process.env;
 
-let BASE_DIR = "";
+let baseDirectory = "";
 
-if(BASE_DIR_ENV !== undefined && BASE_DIR_ENV !== null) {
-    BASE_DIR = BASE_DIR_ENV;
+if(BASE_DIR !== undefined && BASE_DIR !== null) {
+    baseDirectory = BASE_DIR;
 }
 
 if(TYPE === "nixpacks") {
@@ -72,7 +72,7 @@ async function afterCloned() {
 
 async function buildWithNixpacks() {
     const buildCommand = 'nixpacks';
-    const buildArgs = ['build', `/builder${BASE_DIR}`, '--name', ID];
+    const buildArgs = ['build', `/builder${baseDirectory}`, '--name', ID];
 
     const buildProcess = spawn(buildCommand, buildArgs);
 
@@ -95,7 +95,7 @@ async function buildWithNixpacks() {
 
 async function buildWithDockerfile() {
     const buildCommand = `docker`;
-    const buildArgs = ['build', '-t', ID, `/builder${BASE_DIR}`];
+    const buildArgs = ['build', '-t', ID, `/builder${baseDirectory}`];
 
     const buildProcess = spawn(buildCommand, buildArgs);
 
