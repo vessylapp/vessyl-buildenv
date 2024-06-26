@@ -6,7 +6,13 @@ const execAsync = promisify(exec);
 
 dotenv.config();
 
-const { TYPE, REPO_NAME, GITHUB_PAT, GITHUB_USERNAME } = process.env;
+const { TYPE, REPO_NAME, GITHUB_PAT, GITHUB_USERNAME, ID, BASE_DIR_ENV } = process.env;
+
+let BASE_DIR = "";
+
+if(BASE_DIR_ENV !== undefined && BASE_DIR_ENV !== null) {
+    BASE_DIR = BASE_DIR_ENV;
+}
 
 if(TYPE === "nixpacks") {
   console.log("Nixpacks");
@@ -33,8 +39,8 @@ async function cloneRepo() {
 }
 
 async function afterCloned() {
-    const stopContainersCommand = `docker ps -a -q --filter ancestor=${REPO_NAME} | xargs -r docker stop || true`;
-    const deleteCommand = `docker ps -a -q --filter ancestor=${REPO_NAME} | xargs -r docker rm && docker rmi ${REPO_NAME} || true`;
+    const stopContainersCommand = `docker ps -a -q --filter ancestor=${ID} | xargs -r docker stop || true`;
+    const deleteCommand = `docker ps -a -q --filter ancestor=${ID} | xargs -r docker rm && docker rmi ${ID} || true`;
 
     console.log("Repository cloned successfully");
 
@@ -66,7 +72,7 @@ async function afterCloned() {
 
 async function buildWithNixpacks() {
     const buildCommand = 'nixpacks';
-    const buildArgs = ['build', '/builder', '--name', REPO_NAME];
+    const buildArgs = ['build', `/builder${BASE_DIR}`, '--name', ID];
 
     const buildProcess = spawn(buildCommand, buildArgs);
 
@@ -89,7 +95,7 @@ async function buildWithNixpacks() {
 
 async function buildWithDockerfile() {
     const buildCommand = `docker`;
-    const buildArgs = ['build', '-t', REPO_NAME, '/builder'];
+    const buildArgs = ['build', '-t', ID, `/builder${BASE_DIR}`];
 
     const buildProcess = spawn(buildCommand, buildArgs);
 
